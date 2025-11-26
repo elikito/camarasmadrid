@@ -19,28 +19,39 @@ export async function GET() {
     const cameras = (Array.isArray(placemarks) ? placemarks : [placemarks]).map((placemark: any) => {
       const coords = placemark.Point.coordinates.split(',');
       
-      // Extraer datos extendidos
-      let url = '';
-      let id = '';
+      // Extraer URL de imagen desde la descripción
+      let imageUrl = '';
+      let nombre = '';
+      let numero = '';
       
+      if (placemark.description) {
+        // La descripción contiene HTML escapado con la URL de la imagen
+        // Formato: <img src=https://informo.madrid.es/cameras/CamaraXXXXX.jpg?v=XXXX
+        const imgMatch = placemark.description.match(/src=([^\s]+\.jpg[^\s]*)/i);
+        if (imgMatch) {
+          imageUrl = imgMatch[1];
+        }
+      }
+      
+      // Extraer datos extendidos
       if (placemark.ExtendedData && placemark.ExtendedData.Data) {
         const dataArray = Array.isArray(placemark.ExtendedData.Data) 
           ? placemark.ExtendedData.Data 
           : [placemark.ExtendedData.Data];
         
         dataArray.forEach((data: any) => {
-          if (data['@_name'] === 'url') url = data.value;
-          if (data['@_name'] === 'id') id = data.value;
+          if (data['@_name'] === 'Numero') numero = data.Value;
+          if (data['@_name'] === 'Nombre') nombre = data.Value;
         });
       }
       
       return {
-        id: id || `cam_urb_${Math.random().toString(36).substr(2, 9)}`,
-        name: placemark.name,
-        description: placemark.description || '',
+        id: numero || `cam_urb_${Math.random().toString(36).substr(2, 9)}`,
+        name: nombre || placemark.name || 'Cámara urbana',
+        description: nombre || placemark.name || '',
         latitude: parseFloat(coords[1]),
         longitude: parseFloat(coords[0]),
-        imageUrl: url || '',
+        imageUrl: imageUrl,
         source: 'urbanas',
         type: 'camera'
       };
