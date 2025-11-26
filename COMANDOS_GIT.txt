@@ -1,0 +1,172 @@
+# ═══════════════════════════════════════════════════════════
+# 🚀 COMANDOS PARA SUBIR A GITHUB Y DESPLEGAR EN VERCEL
+# ═══════════════════════════════════════════════════════════
+
+# ─────────────────────────────────────────────────────────
+# PASO 1: Crear repositorio en GitHub
+# ─────────────────────────────────────────────────────────
+# 1. Ve a https://github.com
+# 2. Click en "New repository"
+# 3. Nombre: camarasmadrid
+# 4. Descripción: Webapp de cámaras de tráfico de Madrid
+# 5. Público o Privado (tu elección)
+# 6. NO inicialices con README (ya tenemos uno)
+# 7. Click "Create repository"
+
+# ─────────────────────────────────────────────────────────
+# PASO 2: Ejecutar estos comandos en PowerShell
+# ─────────────────────────────────────────────────────────
+
+# Navegar a la carpeta del proyecto (si no estás ya ahí)
+cd c:\Users\ejkitano\VSCode\camarasmadrid
+
+# Inicializar Git
+git init
+
+# Añadir todos los archivos
+git add .
+
+# Ver qué archivos se van a subir (opcional)
+git status
+
+# Hacer el primer commit
+git commit -m "Initial commit: Webapp fullstack Cámaras Madrid con Next.js, Leaflet y TailwindCSS"
+
+# Renombrar rama a 'main' (GitHub usa 'main' por defecto)
+git branch -M main
+
+# Conectar con tu repositorio de GitHub
+# ⚠️ REEMPLAZA 'TU_USUARIO' con tu usuario de GitHub
+git remote add origin https://github.com/TU_USUARIO/camarasmadrid.git
+
+# Subir todo a GitHub
+git push -u origin main
+
+# ─────────────────────────────────────────────────────────
+# PASO 3: Deploy en Vercel
+# ─────────────────────────────────────────────────────────
+# 1. Ve a https://vercel.com
+# 2. Click "Sign Up" o "Log In"
+# 3. Elige "Continue with GitHub"
+# 4. Autoriza Vercel para acceder a GitHub
+# 5. Click "New Project"
+# 6. Busca "camarasmadrid" en la lista
+# 7. Click "Import"
+# 8. Configuración (ya viene automática):
+#    - Framework Preset: Next.js ✓
+#    - Root Directory: ./ ✓
+#    - Build Command: npm run build ✓
+#    - Output Directory: .next ✓
+#    - Install Command: npm install ✓
+# 9. Click "Deploy"
+# 10. Espera 2-3 minutos...
+# 11. ¡Listo! Tu app está en línea
+
+# ─────────────────────────────────────────────────────────
+# PASO 4: Obtener dominio camarasmadrid.vercel.app
+# ─────────────────────────────────────────────────────────
+# Después del primer deploy:
+# 1. Ve a tu proyecto en Vercel Dashboard
+# 2. Click en "Settings"
+# 3. Click en "Domains" en el menú lateral
+# 4. Por defecto tendrás: camarasmadrid-xxxxx.vercel.app
+# 5. Para obtener camarasmadrid.vercel.app:
+#    - Si está disponible, Vercel te lo puede asignar
+#    - O usa el dominio auto-generado
+
+# ─────────────────────────────────────────────────────────
+# COMANDOS PARA ACTUALIZACIONES FUTURAS
+# ─────────────────────────────────────────────────────────
+
+# Cada vez que hagas cambios:
+
+# 1. Ver qué archivos cambiaron
+git status
+
+# 2. Añadir los cambios
+git add .
+
+# 3. Hacer commit con descripción de cambios
+git commit -m "Descripción de los cambios realizados"
+
+# 4. Subir a GitHub
+git push
+
+# 5. Vercel detectará los cambios y re-desplegará automáticamente
+
+# ─────────────────────────────────────────────────────────
+# COMANDOS ÚTILES DE GIT
+# ─────────────────────────────────────────────────────────
+
+# Ver historial de commits
+git log --oneline
+
+# Ver diferencias antes de commit
+git diff
+
+# Deshacer cambios en un archivo (antes de add)
+git checkout -- nombre_archivo.txt
+
+# Ver remotes configurados
+git remote -v
+
+# Actualizar desde GitHub (si trabajas desde varios equipos)
+git pull origin main
+
+# ─────────────────────────────────────────────────────────
+# ⚠️ SI TIENES PROBLEMAS CON GIT
+# ─────────────────────────────────────────────────────────
+
+# Configurar tu identidad (primera vez usando Git)
+git config --global user.name "Tu Nombre"
+git config --global user.email "tu@email.com"
+
+# Si Git no está instalado:
+# 1. Descarga desde: https://git-scm.com/download/win
+# 2. Instala con opciones por defecto
+# 3. Reinicia PowerShell
+# 4. Ejecuta los comandos de arriba
+
+# Si no puedes instalar Git:
+# - Lee DEPLOY.md para alternativas
+# - Puedes usar GitHub Desktop (interfaz gráfica)
+# - O subir archivos manualmente a GitHub (no recomendado)
+
+# ─────────────────────────────────────────────────────────
+# 🎯 VERIFICACIÓN POST-DEPLOY
+# ─────────────────────────────────────────────────────────
+
+# Una vez desplegado, verifica en tu navegador:
+# ✓ La página carga
+# ✓ El mapa de Leaflet aparece
+# ✓ Los marcadores se muestran en Madrid
+# ✓ Los filtros funcionan (urbanas, M-30, radares)
+# ✓ Click en marcador abre modal
+# ✓ Click en imagen expande a pantalla completa
+# ✓ El listado se abre y funciona
+# ✓ La búsqueda funciona
+# ✓ El modo oscuro funciona
+# ✓ El diseño responsive funciona en móvil
+
+# ─────────────────────────────────────────────────────────
+# 🔗 ENLACES IMPORTANTES
+# ─────────────────────────────────────────────────────────
+
+# GitHub: https://github.com
+# Vercel: https://vercel.com
+# Descargar Git: https://git-scm.com/download/win
+# Portal Datos Madrid: https://datos.madrid.es/portal/site/egob/
+
+# ─────────────────────────────────────────────────────────
+# 📞 SOPORTE
+# ─────────────────────────────────────────────────────────
+
+# Si tienes problemas:
+# 1. Lee DEPLOY.md (guía detallada)
+# 2. Lee README.md (documentación completa)
+# 3. Revisa CHECKLIST.txt (verificación paso a paso)
+# 4. Consulta los logs en Vercel Dashboard
+
+# ═══════════════════════════════════════════════════════════
+# ¡Éxito con el deploy! 🚀
+# ═══════════════════════════════════════════════════════════

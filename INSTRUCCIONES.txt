@@ -1,0 +1,15 @@
+# Si tienes Node.js instalado, ejecuta estos comandos:
+
+# Instalar dependencias
+npm install
+
+# Ejecutar en modo desarrollo
+npm run dev
+
+# La aplicación estará disponible en: http://localhost:3000
+
+# Para construir para producción:
+npm run build
+
+# Para ejecutar la versión de producción:
+npm start

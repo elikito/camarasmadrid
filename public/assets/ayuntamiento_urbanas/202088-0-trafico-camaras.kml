@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Cámaras Tráfico Urbanas Madrid</name>
+    <Placemark>
+      <name>Cámara Urbana 1</name>
+      <description>Plaza de España</description>
+      <Point>
+        <coordinates>-3.7123456,40.4234567,0</coordinates>
+      </Point>
+      <ExtendedData>
+        <Data name="url">
+          <value>https://ejemplo.es/camara1.jpg</value>
+        </Data>
+        <Data name="id">
+          <value>cam_urb_001</value>
+        </Data>
+      </ExtendedData>
+    </Placemark>
+    <Placemark>
+      <name>Cámara Urbana 2</name>
+      <description>Gran Vía - Callao</description>
+      <Point>
+        <coordinates>-3.7068456,40.4199567,0</coordinates>
+      </Point>
+      <ExtendedData>
+        <Data name="url">
+          <value>https://ejemplo.es/camara2.jpg</value>
+        </Data>
+        <Data name="id">
+          <value>cam_urb_002</value>
+        </Data>
+      </ExtendedData>
+    </Placemark>
+    <Placemark>
+      <name>Cámara Urbana 3</name>
+      <description>Puerta del Sol</description>
+      <Point>
+        <coordinates>-3.7034789,40.4168678,0</coordinates>
+      </Point>
+      <ExtendedData>
+        <Data name="url">
+          <value>https://ejemplo.es/camara3.jpg</value>
+        </Data>
+        <Data name="id">
+          <value>cam_urb_003</value>
+        </Data>
+      </ExtendedData>
+    </Placemark>
+  </Document>
+</kml>

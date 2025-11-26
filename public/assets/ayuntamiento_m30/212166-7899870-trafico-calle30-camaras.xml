@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<camaras>
+  <camara>
+    <id>cam_m30_001</id>
+    <nombre>M30 Norte - Salida 1</nombre>
+    <descripcion>Cámara M-30 Norte, Salida 1</descripcion>
+    <latitud>40.4567890</latitud>
+    <longitud>-3.6789012</longitud>
+    <imagen>https://ejemplo.es/m30_1.jpg</imagen>
+  </camara>
+  <camara>
+    <id>cam_m30_002</id>
+    <nombre>M30 Sur - Salida 15</nombre>
+    <descripcion>Cámara M-30 Sur, Salida 15</descripcion>
+    <latitud>40.3867890</latitud>
+    <longitud>-3.6989012</longitud>
+    <imagen>https://ejemplo.es/m30_2.jpg</imagen>
+  </camara>
+  <camara>
+    <id>cam_m30_003</id>
+    <nombre>M30 Este - Túnel O'Donnell</nombre>
+    <descripcion>Cámara M-30 Este, Túnel O'Donnell</descripcion>
+    <latitud>40.4167890</latitud>
+    <longitud>-3.6589012</longitud>
+    <imagen>https://ejemplo.es/m30_3.jpg</imagen>
+  </camara>
+  <camara>
+    <id>cam_m30_004</id>
+    <nombre>M30 Oeste - Puente de los Franceses</nombre>
+    <descripcion>Cámara M-30 Oeste, Puente de los Franceses</descripcion>
+    <latitud>40.4367890</latitud>
+    <longitud>-3.7289012</longitud>
+    <imagen>https://ejemplo.es/m30_4.jpg</imagen>
+  </camara>
+</camaras>
