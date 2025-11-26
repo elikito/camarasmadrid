@@ -1,7 +1,0 @@
-id,tipo,ubicacion,latitud,longitud,velocidad_max
-radar_001,fijo,A-1 Km 12,40.5123456,-3.6234567,120
-radar_002,movil,M-40 Salida 25,40.4523456,-3.5934567,100
-radar_003,fijo,M-30 Norte,40.4723456,-3.6834567,90
-radar_004,movil,Castellana - Plaza Castilla,40.4656789,-3.6889012,50
-radar_005,fijo,A-2 Km 8,40.4256789,-3.5989012,120
-radar_006,movil,M-607 Salida 3,40.5256789,-3.7189012,80

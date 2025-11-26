@@ -4,28 +4,38 @@ import path from 'path';
 
 export async function GET() {
   try {
-    const filePath = path.join(process.cwd(), 'public/assets/ayuntamiento_radares/300049-0-radares-fijos-moviles.csv');
+    const filePath = path.join(process.cwd(), 'public/assets/ayuntamiento_radares/RADARES FIJOS_vDTT.csv');
     const csvData = fs.readFileSync(filePath, 'utf-8');
     
     const lines = csvData.split('\n').filter(line => line.trim());
-    const headers = lines[0].split(',');
     
     const radars = lines.slice(1).map((line, index) => {
-      const values = line.split(',');
+      const values = line.split(';');
+      
+      // Usar Longitud y Latitud (columnas 12 y 13)
+      const longitud = parseFloat(values[12]);
+      const latitud = parseFloat(values[13]);
+      
+      // Si no hay coordenadas en esas columnas, intentar con X/Y WGS84 (columnas 10 y 11)
+      const finalLongitud = !isNaN(longitud) ? longitud : parseFloat(values[10]);
+      const finalLatitud = !isNaN(latitud) ? latitud : parseFloat(values[11]);
       
       return {
         id: values[0] || `radar_${index}`,
-        name: values[2] || 'Radar',
-        description: `${values[1]} - Velocidad máx: ${values[5]} km/h`,
-        latitude: parseFloat(values[3]),
-        longitude: parseFloat(values[4]),
-        imageUrl: '', // Los radares generalmente no tienen imagen en vivo
+        name: values[1] || 'Radar',
+        description: `${values[6]} - ${values[2]} - Velocidad máx: ${values[14]} km/h`,
+        latitude: finalLatitud,
+        longitude: finalLongitud,
+        imageUrl: '',
         source: 'radares',
         type: 'radar',
-        radarType: values[1], // fijo o movil
-        maxSpeed: values[5]
+        radarType: values[6], // Tipo
+        maxSpeed: values[14], // Velocidad límite
+        ubicacion: values[1],
+        carretera: values[2],
+        sentido: values[5]
       };
-    });
+    }).filter(radar => !isNaN(radar.latitude) && !isNaN(radar.longitude));
     
     return NextResponse.json(radars);
   } catch (error) {

@@ -58,17 +58,21 @@ export async function GET() {
       const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '@_' });
       const result = parser.parse(xmlData);
       
-      const camerasList = result.camaras.camara;
-      const m30 = (Array.isArray(camerasList) ? camerasList : [camerasList]).map((cam: any) => ({
-        id: cam.id,
-        name: cam.nombre,
-        description: cam.descripcion || '',
-        latitude: parseFloat(cam.latitud),
-        longitude: parseFloat(cam.longitud),
-        imageUrl: cam.imagen || '',
-        source: 'm30',
-        type: 'camera'
-      }));
+      const camerasList = result.Camaras.Camara;
+      const m30 = (Array.isArray(camerasList) ? camerasList : [camerasList]).map((cam: any) => {
+        const imageUrl = cam.URL ? `https://${cam.URL}` : '';
+        
+        return {
+          id: cam.Nombre || `cam_m30_${Math.random().toString(36).substr(2, 9)}`,
+          name: cam.Nombre || 'Cámara M-30',
+          description: cam.Fichero ? cam.Fichero.replace('.jpg', '') : '',
+          latitude: parseFloat(cam.Posicion.Latitud),
+          longitude: parseFloat(cam.Posicion.Longitud),
+          imageUrl: imageUrl,
+          source: 'm30',
+          type: 'camera'
+        };
+      });
       cameras.push(...m30);
     } catch (error) {
       console.error('Error parsing M30:', error);
@@ -76,25 +80,38 @@ export async function GET() {
     
     // 3. Parsear radares (CSV)
     try {
-      const csvPath = path.join(process.cwd(), 'public/assets/ayuntamiento_radares/300049-0-radares-fijos-moviles.csv');
+      const csvPath = path.join(process.cwd(), 'public/assets/ayuntamiento_radares/RADARES FIJOS_vDTT.csv');
       const csvData = fs.readFileSync(csvPath, 'utf-8');
       const lines = csvData.split('\n').filter(line => line.trim());
       
       const radares = lines.slice(1).map((line, index) => {
-        const values = line.split(',');
+        const values = line.split(';');
+        
+        // Usar Longitud y Latitud (columnas 12 y 13)
+        const longitud = parseFloat(values[12]);
+        const latitud = parseFloat(values[13]);
+        
+        // Si no hay coordenadas en esas columnas, intentar con X/Y WGS84 (columnas 10 y 11)
+        const finalLongitud = !isNaN(longitud) ? longitud : parseFloat(values[10]);
+        const finalLatitud = !isNaN(latitud) ? latitud : parseFloat(values[11]);
+        
         return {
           id: values[0] || `radar_${index}`,
-          name: values[2] || 'Radar',
-          description: `${values[1]} - Velocidad máx: ${values[5]} km/h`,
-          latitude: parseFloat(values[3]),
-          longitude: parseFloat(values[4]),
+          name: values[1] || 'Radar',
+          description: `${values[6]} - ${values[2]} - Velocidad máx: ${values[14]} km/h`,
+          latitude: finalLatitud,
+          longitude: finalLongitud,
           imageUrl: '',
           source: 'radares',
           type: 'radar',
-          radarType: values[1],
-          maxSpeed: values[5]
+          radarType: values[6],
+          maxSpeed: values[14],
+          ubicacion: values[1],
+          carretera: values[2],
+          sentido: values[5]
         };
-      });
+      }).filter(radar => !isNaN(radar.latitude) && !isNaN(radar.longitude));
+      
       cameras.push(...radares);
     } catch (error) {
       console.error('Error parsing radares:', error);
