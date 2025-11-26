@@ -52,6 +52,7 @@ export default function CameraList({ cameras, onClose, onCameraSelect }: CameraL
     if (source === 'urbanas') return 'text-green-600 bg-green-50 dark:bg-green-900 dark:text-green-300';
     if (source === 'm30') return 'text-orange-600 bg-orange-50 dark:bg-orange-900 dark:text-orange-300';
     if (source === 'radares') return 'text-red-600 bg-red-50 dark:bg-red-900 dark:text-red-300';
+    if (source === 'dgt') return 'text-blue-600 bg-blue-50 dark:bg-blue-900 dark:text-blue-300';
     return 'text-blue-600 bg-blue-50 dark:bg-blue-900 dark:text-blue-300';
   };
   

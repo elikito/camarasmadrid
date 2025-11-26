@@ -21,6 +21,7 @@ const createCustomIcon = (source: string, type: string) => {
   if (source === 'urbanas') color = '#10b981'; // green
   if (source === 'm30') color = '#f59e0b'; // orange
   if (source === 'radares') color = '#ef4444'; // red
+  if (source === 'dgt') color = '#3b82f6'; // blue
   
   const svgIcon = `
     <svg width="25" height="41" viewBox="0 0 25 41" xmlns="http://www.w3.org/2000/svg">

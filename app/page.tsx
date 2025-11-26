@@ -28,6 +28,7 @@ export default function Home() {
     urbanas: true,
     m30: true,
     radares: true,
+    dgt: true,
   });
   const [darkMode, setDarkMode] = useState(false);
   const [selectedCamera, setSelectedCamera] = useState<Camera | null>(null);
@@ -160,7 +161,8 @@ export default function Home() {
           <p className="text-xs">
             🟢 {cameras.filter(c => c.source === 'urbanas' && filters.urbanas).length} urbanas •{' '}
             🟠 {cameras.filter(c => c.source === 'm30' && filters.m30).length} M-30 •{' '}
-            🔴 {cameras.filter(c => c.source === 'radares' && filters.radares).length} radares
+            🔴 {cameras.filter(c => c.source === 'radares' && filters.radares).length} radares •{' '}
+            🔵 {cameras.filter(c => c.source === 'dgt' && filters.dgt).length} DGT
           </p>
         </div>
       </div>

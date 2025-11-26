@@ -117,6 +117,53 @@ export async function GET() {
       console.error('Error parsing radares:', error);
     }
     
+    // 4. Parsear cámaras DGT (XML DATEX II)
+    try {
+      const dgtPath = path.join(process.cwd(), 'public/assets/dgt/camaras_datex2_v36.xml');
+      const dgtData = fs.readFileSync(dgtPath, 'utf-8');
+      const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '@_' });
+      const result = parser.parse(dgtData);
+      
+      const devices = result['d2:payload']['ns2:device'];
+      const deviceArray = Array.isArray(devices) ? devices : [devices];
+      
+      const dgt = deviceArray
+        .filter((device: any) => {
+          if (device['ns2:typeOfDevice'] !== 'camera') return false;
+          const lat = parseFloat(device['ns2:pointLocation']?.['loc:tpegPointLocation']?.['loc:point']?.['loc:pointCoordinates']?.['loc:latitude']);
+          const lon = parseFloat(device['ns2:pointLocation']?.['loc:tpegPointLocation']?.['loc:point']?.['loc:pointCoordinates']?.['loc:longitude']);
+          return lat >= 39.5 && lat <= 41.2 && lon >= -4.5 && lon <= -3.0;
+        })
+        .map((device: any) => {
+          const id = device['@_id'];
+          const pointLocation = device['ns2:pointLocation'];
+          const roadInfo = pointLocation?.['loc:supplementaryPositionalDescription']?.['loc:roadInformation'];
+          const coordinates = pointLocation?.['loc:tpegPointLocation']?.['loc:point']?.['loc:pointCoordinates'];
+          const extension = pointLocation?.['loc:tpegPointLocation']?.['loc:point']?.['loc:_tpegNonJunctionPointExtension']?.['loc:extendedTpegNonJunctionPoint'];
+          const imageUrl = device['fse:deviceUrl'];
+          
+          const roadName = roadInfo?.['loc:roadName'] || '';
+          const roadDestination = roadInfo?.['loc:roadDestination'] || '';
+          const km = extension?.['lse:kilometerPoint'] || '';
+          const province = extension?.['lse:province'] || '';
+          
+          return {
+            id: `dgt_${id}`,
+            name: `${roadName} ${km ? `PK ${km}` : ''}`.trim() || `Cámara DGT ${id}`,
+            description: `${roadName} dirección ${roadDestination} - ${province}`,
+            latitude: parseFloat(coordinates?.['loc:latitude']),
+            longitude: parseFloat(coordinates?.['loc:longitude']),
+            imageUrl: imageUrl || '',
+            source: 'dgt',
+            type: 'camera'
+          };
+        });
+      
+      cameras.push(...dgt);
+    } catch (error) {
+      console.error('Error parsing DGT:', error);
+    }
+    
     return NextResponse.json(cameras);
   } catch (error) {
     console.error('Error fetching all cameras:', error);

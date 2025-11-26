@@ -42,13 +42,15 @@ export default function Navbar({
   const filterLabels = {
     urbanas: 'Cámaras Urbanas',
     m30: 'Cámaras M-30',
-    radares: 'Radares'
+    radares: 'Radares',
+    dgt: 'Cámaras DGT'
   };
   
   const filterColors = {
     urbanas: 'bg-green-500',
     m30: 'bg-orange-500',
-    radares: 'bg-red-500'
+    radares: 'bg-red-500',
+    dgt: 'bg-blue-500'
   };
   
   return (
