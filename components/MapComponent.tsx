@@ -163,7 +163,7 @@ export default function MapComponent({ cameras, filters, onCameraClick }: MapCom
       <button
         onClick={handleGeolocate}
         disabled={isLocating}
-        className="absolute bottom-6 right-4 z-[1000] bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+        className="absolute bottom-24 right-4 z-[1000] bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
         title="Mi ubicación"
       >
         {isLocating ? (
