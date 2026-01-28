@@ -10,6 +10,14 @@ interface ImageModalProps {
 
 export default function ImageModal({ camera, onClose }: ImageModalProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
+  
+  useEffect(() => {
+    // Reset image states when camera changes
+    setImageLoading(true);
+    setImageError(false);
+  }, [camera]);
   
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -89,21 +97,35 @@ export default function ImageModal({ camera, onClose }: ImageModalProps) {
           
           {/* Image */}
           {camera.type !== 'radar' && (
-            <div className={`${isFullscreen ? 'w-full h-full flex items-center justify-center' : 'p-4'}`}>
+            <div className={`${isFullscreen ? 'w-full h-full flex items-center justify-center' : 'p-4'} relative`}>
               {hasImage ? (
-                <img
-                  src={camera.imageUrl}
-                  alt={camera.name}
-                  className={`${
-                    isFullscreen 
-                      ? 'max-w-full max-h-full object-contain cursor-zoom-out' 
-                      : 'w-full h-auto rounded cursor-zoom-in'
-                  }`}
-                  onClick={() => setIsFullscreen(!isFullscreen)}
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23ddd" width="400" height="300"/%3E%3Ctext fill="%23999" font-size="20" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3EImagen no disponible%3C/text%3E%3C/svg%3E';
-                  }}
-                />
+                <>
+                  {imageLoading && !imageError && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-700">
+                      <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Cargando imagen...</p>
+                      </div>
+                    </div>
+                  )}
+                  <img
+                    src={camera.imageUrl}
+                    alt={camera.name}
+                    loading="lazy"
+                    className={`${
+                      isFullscreen 
+                        ? 'max-w-full max-h-full object-contain cursor-zoom-out' 
+                        : 'w-full h-auto rounded cursor-zoom-in'
+                    } ${imageLoading ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}
+                    onClick={() => setIsFullscreen(!isFullscreen)}
+                    onLoad={() => setImageLoading(false)}
+                    onError={(e) => {
+                      setImageLoading(false);
+                      setImageError(true);
+                      (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23ddd" width="400" height="300"/%3E%3Ctext fill="%23999" font-size="20" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3EImagen no disponible%3C/text%3E%3C/svg%3E';
+                    }}
+                  />
+                </>
               ) : (
                 <div className="w-full h-64 bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center">
                   <div className="text-center text-gray-500 dark:text-gray-400">

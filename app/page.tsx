@@ -27,7 +27,7 @@ export default function Home() {
   const [filters, setFilters] = useState<FilterState>({
     urbanas: true,
     m30: true,
-    radares: true,
+    radares: false,
     dgt: true,
   });
   const [darkMode, setDarkMode] = useState(false);

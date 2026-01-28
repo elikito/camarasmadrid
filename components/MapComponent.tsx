@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, memo, useCallback } from 'react';
 import L from 'leaflet';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap, LayerGroup } from 'react-leaflet';
 import { Camera, FilterState } from '@/types';
 import 'leaflet/dist/leaflet.css';
 
@@ -14,8 +14,16 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Iconos personalizados por tipo
-const createCustomIcon = (source: string, type: string) => {
+// Iconos personalizados por tipo con memoización
+const iconCache = new Map<string, L.DivIcon>();
+
+const getCustomIcon = (source: string, type: string): L.DivIcon => {
+  const cacheKey = `${source}-${type}`;
+  
+  if (iconCache.has(cacheKey)) {
+    return iconCache.get(cacheKey)!;
+  }
+  
   let color = '#3b82f6'; // blue por defecto
   
   if (source === 'urbanas') color = '#10b981'; // green
@@ -31,13 +39,16 @@ const createCustomIcon = (source: string, type: string) => {
     </svg>
   `;
   
-  return L.divIcon({
+  const icon = L.divIcon({
     html: svgIcon,
     className: 'custom-marker',
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
   });
+  
+  iconCache.set(cacheKey, icon);
+  return icon;
 };
 
 const createUserIcon = () => {
@@ -73,7 +84,43 @@ function MapEvents() {
   return null;
 }
 
-export default function MapComponent({ cameras, filters, onCameraClick }: MapComponentProps) {
+// Memoizar el componente de marcador individual
+const CameraMarker = memo(({ 
+  camera, 
+  onClick 
+}: { 
+  camera: Camera; 
+  onClick: (camera: Camera) => void;
+}) => {
+  const handleClick = useCallback(() => {
+    onClick(camera);
+  }, [camera, onClick]);
+
+  return (
+    <Marker
+      position={[camera.latitude, camera.longitude]}
+      icon={getCustomIcon(camera.source, camera.type)}
+      eventHandlers={{
+        click: handleClick,
+      }}
+    >
+      <Popup>
+        <div className="p-2">
+          <h3 className="font-bold text-sm">{camera.name}</h3>
+          <p className="text-xs text-gray-600">{camera.description}</p>
+          <p className="text-xs text-blue-600 mt-1 capitalize">Fuente: {camera.source}</p>
+        </div>
+      </Popup>
+    </Marker>
+  );
+}, (prevProps, nextProps) => {
+  // Solo re-renderizar si la cámara o el onClick cambian
+  return prevProps.camera.id === nextProps.camera.id;
+});
+
+CameraMarker.displayName = 'CameraMarker';
+
+function MapComponent({ cameras, filters, onCameraClick }: MapComponentProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [isLocating, setIsLocating] = useState(false);
@@ -82,7 +129,7 @@ export default function MapComponent({ cameras, filters, onCameraClick }: MapCom
     setIsMounted(true);
   }, []);
   
-  const handleGeolocate = () => {
+  const handleGeolocate = useCallback(() => {
     if (!navigator.geolocation) {
       alert('Tu navegador no soporta geolocalización');
       return;
@@ -101,7 +148,24 @@ export default function MapComponent({ cameras, filters, onCameraClick }: MapCom
         setIsLocating(false);
       }
     );
-  };
+  }, []);
+  
+  // Memoizar el filtrado para evitar re-renders innecesarios
+  // IMPORTANTE: Los hooks deben ejecutarse antes de cualquier return condicional
+  const filteredCameras = useMemo(() => {
+    return cameras.filter(camera => filters[camera.source]);
+  }, [cameras, filters]);
+
+  // Estadísticas para mostrar al usuario
+  const stats = useMemo(() => {
+    const total = filteredCameras.length;
+    const urbanas = filteredCameras.filter(c => c.source === 'urbanas').length;
+    const m30 = filteredCameras.filter(c => c.source === 'm30').length;
+    const radares = filteredCameras.filter(c => c.source === 'radares').length;
+    const dgt = filteredCameras.filter(c => c.source === 'dgt').length;
+    
+    return { total, urbanas, m30, radares, dgt };
+  }, [filteredCameras]);
   
   if (!isMounted) {
     return (
@@ -111,8 +175,6 @@ export default function MapComponent({ cameras, filters, onCameraClick }: MapCom
     );
   }
   
-  const filteredCameras = cameras.filter(camera => filters[camera.source]);
-  
   return (
     <div className="relative w-full h-full">
       <MapContainer
@@ -120,31 +182,25 @@ export default function MapComponent({ cameras, filters, onCameraClick }: MapCom
         zoom={userLocation ? 14 : 12}
         className="w-full h-full z-0"
         zoomControl={true}
+        preferCanvas={true} // Usar Canvas para mejor rendimiento con muchos marcadores
       >
         <MapEvents />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          updateWhenIdle={true} // Cargar tiles solo cuando el mapa esté quieto
+          keepBuffer={2} // Reducir el buffer de tiles
         />
         
-        {filteredCameras.map((camera) => (
-          <Marker
-            key={camera.id}
-            position={[camera.latitude, camera.longitude]}
-            icon={createCustomIcon(camera.source, camera.type)}
-            eventHandlers={{
-              click: () => onCameraClick(camera),
-            }}
-          >
-            <Popup>
-              <div className="p-2">
-                <h3 className="font-bold text-sm">{camera.name}</h3>
-                <p className="text-xs text-gray-600">{camera.description}</p>
-                <p className="text-xs text-blue-600 mt-1 capitalize">Fuente: {camera.source}</p>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        <LayerGroup>
+          {filteredCameras.map((camera) => (
+            <CameraMarker
+              key={camera.id}
+              camera={camera}
+              onClick={onCameraClick}
+            />
+          ))}
+        </LayerGroup>
         
         {userLocation && (
           <Marker
@@ -159,6 +215,21 @@ export default function MapComponent({ cameras, filters, onCameraClick }: MapCom
           </Marker>
         )}
       </MapContainer>
+      
+      {/* Contador de cámaras visibles */}
+      <div className="absolute top-4 left-4 z-[1000] bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg">
+        <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+          📹 {stats.total} cámaras
+        </div>
+        {stats.total > 0 && (
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 space-y-0.5">
+            {stats.urbanas > 0 && <div>🟢 Urbanas: {stats.urbanas}</div>}
+            {stats.m30 > 0 && <div>🟠 M-30: {stats.m30}</div>}
+            {stats.radares > 0 && <div>🔴 Radares: {stats.radares}</div>}
+            {stats.dgt > 0 && <div>🔵 DGT: {stats.dgt}</div>}
+          </div>
+        )}
+      </div>
       
       <button
         onClick={handleGeolocate}
@@ -181,3 +252,5 @@ export default function MapComponent({ cameras, filters, onCameraClick }: MapCom
     </div>
   );
 }
+
+export default memo(MapComponent);
